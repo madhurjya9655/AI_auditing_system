@@ -1,0 +1,14 @@
+PyMuPDF
+gspread
+oauth2client
+streamlit
+pandas
+python-dotenv
+openai
+Pillow
+numpy
+pytesseract
+opencv-python
+scikit-image
+pdf2image
+plotly
