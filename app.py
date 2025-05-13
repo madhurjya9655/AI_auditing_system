@@ -25,7 +25,6 @@ from dateutil.parser import parse
 import re
 from difflib import SequenceMatcher
 
-
 # Load environment variables
 load_dotenv()
 
@@ -43,118 +42,73 @@ st.set_page_config(
 # Add custom CSS
 st.markdown("""
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-  :root {
-    --bg: #f0f4f8;
-    --surface: #ffffff;
-    --primary: #3b82f6;
-    --secondary: #10b981;
-    --danger: #ef4444;
-    --text: #1f2937;
-    --muted: #6b7280;
-    --shadow: rgba(0,0,0,0.05);
-  }
-  body, .stApp {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg);
-    color: var(--text);
-  }
-  .main-header {
-    font-size: 2.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, var(--primary), #7dd3fc);
-    color: #fff;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px var(--shadow);
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  .sub-header {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--primary);
-    position: relative;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  .sub-header::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 3rem;
-    height: 0.25rem;
-    background: var(--primary);
-    border-radius: 0.25rem;
-  }
-  .card {
-    background-color: var(--surface);
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 8px 16px var(--shadow);
-    margin-bottom: 1.5rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 32px var(--shadow);
-  }
-  .status-match,
-  .status-mismatch {
-    display: inline-block;
-    font-weight: 600;
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
-    font-size: 0.9rem;
-  }
-  .status-match {
-    background-color: var(--secondary);
-    color: #fff;
-  }
-  .status-mismatch {
-    background-color: var(--danger);
-    color: #fff;
-  }
-  .instructions {
-    background-color: #e0f2fe;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-    color: var(--text);
-  }
-  .highlight {
-    background-color: #fde68a;
-    padding: 0.2rem 0.4rem;
-    border-radius: 0.25rem;
-    font-weight: 600;
-  }
-  .comparison-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top: 1rem;
-  }
-  .comparison-table th,
-  .comparison-table td {
-    padding: 0.75rem 1rem;
-    text-align: left;
-  }
-  .comparison-table th {
-    background-color: #e0f2fe;
-    font-weight: 600;
-  }
-  .comparison-table tr:nth-child(even) {
-    background-color: #f9fafb;
-  }
-  .stProgress > div > div > div > div {
-    background-color: var(--primary) !important;
-  }
+    .main-header {
+        font-size: 2.5rem;
+        color: #1E3A8A;
+        background-color: #EFF6FF;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    .sub-header {
+        font-size: 1.5rem;
+        color: #2563EB;
+        background-color: #EFF6FF;
+        padding: 8px;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+    }
+    .card {
+        background-color: #F3F4F6;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    .status-match {
+        color: #10B981;
+        font-weight: bold;
+    }
+    .status-mismatch {
+        color: #EF4444;
+        font-weight: bold;
+    }
+    .instructions {
+        background-color: #E0F2FE;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .stProgress > div > div > div > div {
+        background-color: #3B82F6;
+    }
+    .highlight {
+        background-color: #FFEDD5;
+        padding: 2px 5px;
+        border-radius: 3px;
+    }
+    .pdf-preview {
+        border: 1px solid #E5E7EB;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    .ai-badge {
+        background-color: #7C3AED;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.8em;
+        margin-left: 10px;
+    }
+    .comparison-table th {
+        background-color: #EFF6FF;
+    }
+    .comparison-table tr:nth-child(even) {
+        background-color: #F9FAFB;
+    }
 </style>
-
 """, unsafe_allow_html=True)
-
 
 
 def extract_text_from_pdf(file):
@@ -925,124 +879,109 @@ def match_po_number(po_number, invoice_text):
     return False
 
 def compare_data(po_data, invoice_data):
-    """
-    Compare PO and invoice data to identify discrepancies,
-    with a fallback that simply looks for any PO-derived token
-    (e.g. EN codes or long words) in the invoice raw text.
-    """
-    import re
+    """Compare PO and invoice data to identify discrepancies"""
     from difflib import SequenceMatcher
+    import re
 
     discrepancies = []
     comparison_results = {}
+    raw_invoice = invoice_data.get('raw_text', '')
+    po_items = po_data.get("Product Details", []) if isinstance(po_data.get("Product Details", []), list) else []
+    invoice_items = invoice_data.get("Product Details", []) if isinstance(invoice_data.get("Product Details", []), list) else []
 
-    # get the raw invoice text for simple substring searches
-    raw_invoice = invoice_data.get('raw_text', '').lower()
+    # Format as list if not already a list (handling different data structures)
+    if not po_items and isinstance(po_data.get("Product Details", ""), str) and po_data.get("Product Details", "") != "Not found":
+        po_items = [{"Description": po_data.get("Product Details", ""), 
+                    "HSN/SAC": po_data.get("HSN/SAC", ""), 
+                    "Quantity": po_data.get("Quantity", ""), 
+                    "Rate": po_data.get("Rate", "")}]
+                    
+    if not invoice_items and isinstance(invoice_data.get("Product Details", ""), str) and invoice_data.get("Product Details", "") != "Not found":
+        invoice_items = [{"Description": invoice_data.get("Product Details", ""), 
+                         "HSN/SAC": invoice_data.get("HSN/SAC", ""), 
+                         "Quantity": invoice_data.get("Quantity", ""), 
+                         "Rate": invoice_data.get("Rate", "")}]
 
-    # normalize Product Details into lists of items
-    po_items = po_data.get("Product Details", [])
-    if not isinstance(po_items, list):
-        po_items = [{
-            "Description": po_data.get("Product Details", ""),
-            "HSN/SAC":      po_data.get("HSN/SAC", ""),
-            "Quantity":     po_data.get("Quantity", ""),
-            "Rate":         po_data.get("Rate", "")
-        }]
-    invoice_items = invoice_data.get("Product Details", [])
-    if not isinstance(invoice_items, list):
-        invoice_items = [{
-            "Description": invoice_data.get("Product Details", ""),
-            "HSN/SAC":      invoice_data.get("HSN/SAC", ""),
-            "Quantity":     invoice_data.get("Quantity", ""),
-            "Rate":         invoice_data.get("Rate", "")
-        }]
-
-    # normalized scalar fields
-    npo  = normalize_data(po_data)
+    npo = normalize_data(po_data)
     ninv = normalize_data(invoice_data)
 
-    # the rest of your field-by-field mapping
     field_map = {
-        'PO Number':      'Customer Order Number',
-        'Buyer':          'Buyer',
+        'PO Number': 'Customer Order Number',
+        'Buyer': 'Buyer',
         'Supplier GSTIN': 'GSTIN',
-        'Buyer GSTIN':    'Consignee GSTIN',
-        'Destination':    'Destination',
+        'Buyer GSTIN': 'Consignee GSTIN',
+        'Destination': 'Destination',
         'Delivery Terms': 'Term of Delivery',
-        'Payment Terms':  'Payment Terms'
+        'Payment Terms': 'Payment Terms'
     }
 
-    # ─── 1) Attempt your existing line‐item matcher ─────────────────────────────
-    mr = match_po_invoice_items(po_items, invoice_items)
-    product_match = mr["all_matched"] or len(mr["matches"]) > 0
-    matching_details = {
-        "matches_found":      len(mr["matches"]),
-        "total_po_items":     len(po_items),
-        "matched_items":      mr["matches"],
-        "unmatched_po_items": mr["unmatched_po_items"]
-    }
-    hsn_match  = any("HSN match"  in r for m in mr["matches"] for r in m.get("match_reasons", []))
-    rate_match = any("Rate match" in r for m in mr["matches"] for r in m.get("match_reasons", []))
-
-    # ─── 2) FALLBACK: simple substring or token check ──────────────────────────
-    if not product_match:
-        # A) Look for any EN### code from the PO in the invoice raw text
-        po_desc = " ".join(i.get("Description","") for i in po_items)
-        grades = re.findall(r'\bEN\d+\b', po_desc, flags=re.IGNORECASE)
-        if any(g.lower() in raw_invoice for g in grades):
-            product_match = True
-            matching_details["grade_fallback"] = grades
-        else:
-            # B) Token overlap: any long word (>=4 chars) in both?
-            po_tokens  = {w for w in re.findall(r'\w+', po_desc.lower()) if len(w)>=4}
-            inv_tokens = set(re.findall(r'\w+', raw_invoice))
-            overlap   = po_tokens & inv_tokens
-            if overlap:
-                product_match = True
-                # only keep up to 5 examples
-                matching_details["token_fallback"] = list(overlap)[:5]
-
+    # Handle PO vs Invoice Line Item Matching with improved algorithm
+    product_match = False
+    hsn_match = False
+    rate_match = False
+    matching_details = {}
+    
+    # Use the new advanced matching function
+    if po_items and invoice_items:
+        matching_result = match_po_invoice_items(po_items, invoice_items)
+        product_match = matching_result["all_matched"] or len(matching_result["matches"]) > 0
+        
+        # Extract detailed matching information for reporting
+        matching_details = {
+            "matches_found": len(matching_result["matches"]),
+            "total_po_items": len(po_items),
+            "matched_items": matching_result["matches"],
+            "unmatched_po_items": matching_result["unmatched_po_items"]
+        }
+        
+        # Check if any HSN codes matched
+        hsn_match = any(match.get("match_reasons", []) and 
+                        any("HSN match" in reason for reason in match.get("match_reasons", [])) 
+                        for match in matching_result["matches"])
+        
+        # Check if any rates matched
+        rate_match = any(match.get("match_reasons", []) and 
+                         any("Rate match" in reason for reason in match.get("match_reasons", [])) 
+                         for match in matching_result["matches"])
+    
+    # Add product details comparison
     comparison_results['Product Details'] = {
-        "po_value":      format_product_details(po_items),
+        "po_value": format_product_details(po_items),
         "invoice_value": format_product_details(invoice_items),
-        "match":         product_match,
+        "match": product_match,
         "match_details": matching_details
     }
+    
     comparison_results['HSN/SAC'] = {
-        "po_value":      extract_hsn_codes(po_items),
+        "po_value": extract_hsn_codes(po_items),
         "invoice_value": extract_hsn_codes(invoice_items),
-        "match":         hsn_match
+        "match": hsn_match
     }
+    
     comparison_results['Rate'] = {
-        "po_value":      extract_rates(po_items),
+        "po_value": extract_rates(po_items),
         "invoice_value": extract_rates(invoice_items),
-        "match":         rate_match
+        "match": rate_match
     }
 
-    # ─── 3) Other scalar fields ────────────────────────────────────────────────
+    # Match other fields with existing logic
     for pf, iv in field_map.items():
-        pv  = npo.get(pf, "Not found")
+        pv = npo.get(pf, "Not found")
         ivv = ninv.get(iv, "Not found")
         match = False
 
         if pf == 'PO Number':
             match = match_po_number(pv, raw_invoice)
 
-        elif pf == 'Destination':
-            # first try substring
-            if ivv.strip().lower() in pv.strip().lower():
-                match = True
+        elif pf in ['Destination', 'Buyer']:
+            if pv.lower().startswith("no ") or ivv.lower().startswith("no "):
+                match = False
             else:
-                match = token_overlap(pv, ivv, threshold=0.4)
-
-        elif pf == 'Buyer':
-            match = token_overlap(pv, ivv, threshold=0.5) \
-                    if not (pv.lower().startswith("no ") or ivv.lower().startswith("no ")) \
-                    else False
+                match = token_overlap(pv, ivv, threshold=0.5)
 
         elif pf == 'Delivery Terms':
-            kws = ['dispatch','ex','plant','from','delivery']
-            if any(k in pv.lower() for k in kws) and any(k in ivv.lower() for k in kws):
+            keywords = ['dispatch', 'ex', 'plant', 'from', 'delivery']
+            if any(k in pv.lower() for k in keywords) and any(k in ivv.lower() for k in keywords):
                 match = True
             else:
                 match = token_overlap(pv, ivv, threshold=0.4)
@@ -1054,12 +993,17 @@ def compare_data(po_data, invoice_data):
                 match = token_overlap(pv, ivv)
 
         elif 'GSTIN' in pf:
-            match = re.sub(r'\W+','',pv).upper() == re.sub(r'\W+','',ivv).upper()
+            match = re.sub(r'\W+', '', pv).upper() == re.sub(r'\W+', '', ivv).upper()
 
         else:
             match = token_overlap(pv, ivv)
 
-        comparison_results[pf] = {"po_value": pv, "invoice_value": ivv, "match": match}
+        comparison_results[pf] = {
+            "po_value": pv,
+            "invoice_value": ivv,
+            "match": match
+        }
+
         if not match:
             discrepancies.append({
                 "field": pf,
@@ -1067,19 +1011,21 @@ def compare_data(po_data, invoice_data):
                 "invoice_value": ivv
             })
 
-    # ─── 4) Collect leftover mismatches ─────────────────────────────────────────
+    # Add product mismatches to discrepancies if needed
     if not product_match:
         discrepancies.append({
             "field": "Product Details",
             "po_value": comparison_results['Product Details']["po_value"],
             "invoice_value": comparison_results['Product Details']["invoice_value"]
         })
+    
     if not hsn_match:
         discrepancies.append({
             "field": "HSN/SAC",
             "po_value": comparison_results['HSN/SAC']["po_value"],
             "invoice_value": comparison_results['HSN/SAC']["invoice_value"]
         })
+        
     if not rate_match:
         discrepancies.append({
             "field": "Rate",
@@ -1088,7 +1034,6 @@ def compare_data(po_data, invoice_data):
         })
 
     return discrepancies, comparison_results
-
 
 
 def format_product_details(items):
@@ -1532,7 +1477,7 @@ def main():
     if 'results' not in st.session_state:
         st.session_state['results'] = None
 
-        st.markdown('<h1 class="main-header">AI-Powered PO vs Invoice Comparison Tool</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">AI-Powered PO vs Invoice Comparison Tool</h1>', unsafe_allow_html=True)
     with st.expander("How to use this tool", expanded=False):
         st.markdown("""
 1. **Upload PO**  
