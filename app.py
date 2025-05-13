@@ -43,67 +43,118 @@ st.set_page_config(
 # Add custom CSS
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.5rem;
-        color: #1E3A8A;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .sub-header {
-        font-size: 1.5rem;
-        color: #2563EB;
-        margin-bottom: 1rem;
-    }
-    .card {
-        background-color: #F3F4F6;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-    }
-    .status-match {
-        color: #10B981;
-        font-weight: bold;
-    }
-    .status-mismatch {
-        color: #EF4444;
-        font-weight: bold;
-    }
-    .instructions {
-        background-color: #E0F2FE;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-    }
-    .stProgress > div > div > div > div {
-        background-color: #3B82F6;
-    }
-    .highlight {
-        background-color: #FFEDD5;
-        padding: 2px 5px;
-        border-radius: 3px;
-    }
-    .pdf-preview {
-        border: 1px solid #E5E7EB;
-        border-radius: 5px;
-        padding: 10px;
-    }
-    .ai-badge {
-        background-color: #7C3AED;
-        color: white;
-        padding: 3px 8px;
-        border-radius: 10px;
-        font-size: 0.8em;
-        margin-left: 10px;
-    }
-    .comparison-table th {
-        background-color: #EFF6FF;
-    }
-    .comparison-table tr:nth-child(even) {
-        background-color: #F9FAFB;
-    }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --primary: #3b82f6;
+    --secondary: #10b981;
+    --danger: #ef4444;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --shadow: rgba(0,0,0,0.05);
+  }
+  body, .stApp {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+  }
+  .main-header {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary), #7dd3fc);
+    color: #fff;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px var(--shadow);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .sub-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary);
+    position: relative;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .sub-header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 3rem;
+    height: 0.25rem;
+    background: var(--primary);
+    border-radius: 0.25rem;
+  }
+  .card {
+    background-color: var(--surface);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 16px var(--shadow);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px var(--shadow);
+  }
+  .status-match,
+  .status-mismatch {
+    display: inline-block;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+  }
+  .status-match {
+    background-color: var(--secondary);
+    color: #fff;
+  }
+  .status-mismatch {
+    background-color: var(--danger);
+    color: #fff;
+  }
+  .instructions {
+    background-color: #e0f2fe;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  .highlight {
+    background-color: #fde68a;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+  }
+  .comparison-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1rem;
+  }
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
+  .comparison-table th {
+    background-color: #e0f2fe;
+    font-weight: 600;
+  }
+  .comparison-table tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+  .stProgress > div > div > div > div {
+    background-color: var(--primary) !important;
+  }
 </style>
+
 """, unsafe_allow_html=True)
+
 
 
 def extract_text_from_pdf(file):
@@ -1481,9 +1532,25 @@ def main():
     if 'results' not in st.session_state:
         st.session_state['results'] = None
 
-    st.markdown('<h1 class="main-header">AI-Powered PO vs Invoice Comparison Tool</h1>', unsafe_allow_html=True)
+        st.markdown('<h1 class="main-header">AI-Powered PO vs Invoice Comparison Tool</h1>', unsafe_allow_html=True)
     with st.expander("How to use this tool", expanded=False):
-        st.markdown("""...instructions...""", unsafe_allow_html=True)
+        st.markdown("""
+1. **Upload PO**  
+   • In the left card, click **Upload PO PDF** and select your Purchase Order file.  
+2. **Preview PO** *(optional)*  
+   • Expand **Preview PO Document** to verify the uploaded file.  
+3. **Upload Invoice**  
+   • In the right card, click **Upload Invoice PDF** and select your Invoice file.  
+4. **Preview Invoice** *(optional)*  
+   • Expand **Preview Invoice Document** to verify the upload.  
+5. **Process Documents**  
+   • Click **📊 Process Documents** to extract data, compare fields, and detect discrepancies.  
+6. **View Results**  
+   • Scroll down to see a summary status, detailed table, and line‐item matching gauge.  
+7. **Download Outputs**  
+   • Download highlighted PDFs or the markdown report via the buttons at the bottom.  
+""", unsafe_allow_html=True)
+
 
     col1, col2 = st.columns(2)
     uploaded_po, uploaded_invoice = None, None
