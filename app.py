@@ -323,4 +323,4 @@ else:
     )
 
 # Footer
-st.markdown("<div class='footer'>Powered by OpenAI GPT-4 | Built with Streamlit</div>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>Developed by Madhurjya Bora</div>", unsafe_allow_html=True)
